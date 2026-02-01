@@ -104,7 +104,10 @@ export default function CartClient() {
   };
 
   const items = cart?.items || [];
-  const itemsTotal = items.reduce((sum, i) => sum + i.priceSnapshotUSD * i.qty, 0);
+  const itemsTotal = items.reduce(
+    (sum, i) => sum + i.priceSnapshotUSD * i.qty,
+    0
+  );
 
   return (
     <main style={{ padding: 24, fontFamily: "system-ui", maxWidth: 700 }}>
