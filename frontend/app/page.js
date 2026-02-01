@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import ProductsClient from "./components/ProductsClient";
 
 export default async function Home() {
