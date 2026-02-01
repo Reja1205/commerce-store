@@ -1,6 +1,6 @@
 export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store";
 "use client";
-
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -40,7 +40,6 @@ export default function CartPage() {
   };
 
   useEffect(() => {
-    // show checkout success message if redirected here
     const ok = searchParams.get("success");
     if (ok === "1") setMsg("Checkout successful ✅ Your order has been placed.");
     loadCart();
@@ -65,7 +64,7 @@ export default function CartPage() {
       const data = await res.json();
       if (!res.ok) setMsg(data?.message || "Failed to update quantity");
       else setCart(data.cart);
-    } catch (e) {
+    } catch {
       setMsg("Network error");
     }
   };
@@ -81,7 +80,7 @@ export default function CartPage() {
       const data = await res.json();
       if (!res.ok) setMsg(data?.message || "Failed to remove item");
       else setCart(data.cart);
-    } catch (e) {
+    } catch {
       setMsg("Network error");
     }
   };
@@ -100,10 +99,9 @@ export default function CartPage() {
       if (!res.ok) {
         setMsg(data?.message || "Checkout failed");
       } else {
-        // go to orders page after checkout
         router.push("/orders");
       }
-    } catch (e) {
+    } catch {
       setMsg("Network error");
     } finally {
       setCheckingOut(false);
@@ -111,7 +109,10 @@ export default function CartPage() {
   };
 
   const items = cart?.items || [];
-  const itemsTotal = items.reduce((sum, i) => sum + i.priceSnapshotUSD * i.qty, 0);
+  const itemsTotal = items.reduce(
+    (sum, i) => sum + i.priceSnapshotUSD * i.qty,
+    0
+  );
 
   return (
     <main style={{ padding: 24, fontFamily: "system-ui", maxWidth: 700 }}>
@@ -122,15 +123,15 @@ export default function CartPage() {
         <Link href="/orders">My orders</Link>
       </div>
 
-      {loading ? <p>Loading...</p> : null}
+      {loading && <p>Loading...</p>}
 
-      {msg ? (
+      {msg && (
         <div style={{ marginTop: 12, border: "1px solid #ddd", padding: 10, borderRadius: 8 }}>
           {msg}
         </div>
-      ) : null}
+      )}
 
-      {!loading && items.length === 0 ? (
+      {!loading && items.length === 0 && (
         <div style={{ marginTop: 16 }}>
           <p>Your cart is empty.</p>
           <Link
@@ -146,16 +147,13 @@ export default function CartPage() {
             Browse products
           </Link>
         </div>
-      ) : null}
+      )}
 
-      {!loading && items.length > 0 ? (
+      {!loading && items.length > 0 && (
         <>
           <ul style={{ padding: 0, listStyle: "none", display: "grid", gap: 12, marginTop: 16 }}>
             {items.map((i) => (
-              <li
-                key={i.productId}
-                style={{ border: "1px solid #ddd", borderRadius: 8, padding: 12 }}
-              >
+              <li key={i.productId} style={{ border: "1px solid #ddd", borderRadius: 8, padding: 12 }}>
                 <div style={{ fontWeight: 700 }}>{i.titleSnapshot}</div>
                 <div style={{ opacity: 0.7 }}>Slug: {i.slugSnapshot}</div>
                 <div>Price: ${i.priceSnapshotUSD}</div>
@@ -196,7 +194,7 @@ export default function CartPage() {
             </button>
           </div>
         </>
-      ) : null}
+      )}
     </main>
   );
 }
