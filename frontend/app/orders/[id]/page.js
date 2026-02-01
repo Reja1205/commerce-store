@@ -6,7 +6,7 @@ export const fetchCache = "force-no-store";
 
 export default function OrderDetailsPage() {
   return (
-    <Suspense fallback={<div style={{ padding: 24, fontFamily: "system-ui" }}>Loading...</div>}>
+    <Suspense fallback={<div style={{ padding: 24 }}>Loading...</div>}>
       <OrderDetailsClient />
     </Suspense>
   );
