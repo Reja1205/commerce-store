@@ -1,0 +1,5 @@
+/* minimal file so Next build passes */
+html, body {
+  padding: 0;
+  margin: 0;
+}

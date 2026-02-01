@@ -16,7 +16,7 @@ export default function AdminProductsPage() {
         credentials: "include",
         cache: "no-store",
       });
-      const data = await res.json();
+      const data = await res.json();a
 
       if (!res.ok) {
         setMsg(data?.message || "Failed to load products");

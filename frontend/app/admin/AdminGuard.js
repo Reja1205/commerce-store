@@ -1,5 +1,3 @@
-export const dynamic = "force-dynamic";
-export const fetchCache = "force-no-store";
 "use client";
 
 import { useEffect, useState } from "react";
@@ -10,7 +8,11 @@ export default function AdminGuard({ children }) {
   const router = useRouter();
   const pathname = usePathname();
 
-  const [state, setState] = useState({ loading: true, allowed: false, message: "" });
+  const [state, setState] = useState({
+    loading: true,
+    allowed: false,
+    message: "",
+  });
 
   useEffect(() => {
     const run = async () => {
@@ -19,22 +21,26 @@ export default function AdminGuard({ children }) {
           credentials: "include",
           cache: "no-store",
         });
+
         const data = await res.json();
 
         if (!res.ok || !data?.user) {
-          // not logged in
-          router.push(`/login`);
+          router.push("/login");
           return;
         }
 
         if (data.user.role !== "admin") {
-          setState({ loading: false, allowed: false, message: "Admin access required" });
+          setState({
+            loading: false,
+            allowed: false,
+            message: "Admin access required",
+          });
           return;
         }
 
         setState({ loading: false, allowed: true, message: "" });
-      } catch (e) {
-        router.push(`/login`);
+      } catch {
+        router.push("/login");
       }
     };
 
@@ -43,13 +49,7 @@ export default function AdminGuard({ children }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
-  if (state.loading) {
-    return (
-      <main style={{ padding: 24, fontFamily: "system-ui" }}>
-        <p>Checking access...</p>
-      </main>
-    );
-  }
+  if (state.loading) return <div style={{ padding: 24 }}>Checking access...</div>;
 
   if (!state.allowed) {
     return (
