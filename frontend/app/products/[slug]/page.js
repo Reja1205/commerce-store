@@ -1,4 +1,3 @@
-export const dynamic = "force-dynamic";
 import AddToCartButton from "./AddToCartButton";
 
 export default async function ProductDetails({ params }) {
