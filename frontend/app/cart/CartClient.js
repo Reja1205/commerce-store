@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function CartClient() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const base = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
   const [cart, setCart] = useState(null);
@@ -38,13 +39,12 @@ export default function CartClient() {
   };
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("success") === "1") {
+    // Check for success param using the Next.js hook instead of window.location
+    if (searchParams.get("success") === "1") {
       setMsg("Checkout successful ✅ Your order has been placed.");
     }
     loadCart();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [searchParams]);
 
   const updateQty = async (productId, qty) => {
     if (!Number.isFinite(qty) || qty < 1) {

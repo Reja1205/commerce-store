@@ -1,9 +1,18 @@
-export const dynamic = "force-dynamic";
+"use client";
 
+import { Suspense } from "react";
 import dynamic from "next/dynamic";
 
-const CartClient = dynamic(() => import("./CartClient"), { ssr: false });
+// Dynamically import the client component to ensure it only runs on the client
+const CartClient = dynamic(() => import("./CartClient"), { 
+  ssr: false,
+  loading: () => <p>Loading Cart...</p> 
+});
 
 export default function CartPage() {
-  return <CartClient />;
+  return (
+    <Suspense fallback={<p>Loading search parameters...</p>}>
+      <CartClient />
+    </Suspense>
+  );
 }
