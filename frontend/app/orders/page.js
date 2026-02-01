@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic";
 
 export default function OrdersPage() {
   return (
-    <Suspense fallback={<div style={{ padding: 24 }}>Loading...</div>}>
+    <Suspense fallback={<div>Loading...</div>}>
       <OrdersClient />
     </Suspense>
   );

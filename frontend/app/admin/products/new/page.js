@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -32,14 +31,9 @@ export default function NewProductPage() {
         }),
       });
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        setMsg(data?.message || "Failed to create product");
-      } else {
-        router.push("/admin/products");
-      }
-    } catch (e) {
+      if (res.ok) router.push("/admin/products");
+      else setMsg("Failed to create product");
+    } catch {
       setMsg("Network error");
     } finally {
       setLoading(false);
@@ -47,35 +41,16 @@ export default function NewProductPage() {
   };
 
   return (
-    <main style={{ padding: 24, fontFamily: "system-ui", maxWidth: 500 }}>
+    <main style={{ padding: 24 }}>
       <Link href="/admin/products">← Back</Link>
-      <h1 style={{ marginTop: 12 }}>Add Product</h1>
+      <h1>Add Product</h1>
 
       <form onSubmit={submit} style={{ display: "grid", gap: 10 }}>
-        <input
-          placeholder="Title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          required
-        />
-        <input
-          placeholder="Price (USD)"
-          type="number"
-          value={priceUSD}
-          onChange={(e) => setPriceUSD(e.target.value)}
-          required
-        />
-        <input
-          placeholder="Stock Qty"
-          type="number"
-          value={stockQty}
-          onChange={(e) => setStockQty(e.target.value)}
-          required
-        />
+        <input placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
+        <input type="number" placeholder="Price" value={priceUSD} onChange={(e) => setPriceUSD(e.target.value)} />
+        <input type="number" placeholder="Stock" value={stockQty} onChange={(e) => setStockQty(e.target.value)} />
 
-        <button disabled={loading}>
-          {loading ? "Saving..." : "Create Product"}
-        </button>
+        <button disabled={loading}>{loading ? "Saving..." : "Create"}</button>
       </form>
 
       {msg && <p>{msg}</p>}

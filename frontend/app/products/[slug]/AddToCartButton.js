@@ -1,45 +1,52 @@
-"use client";
+import AddToCartButton from "./AddToCartButton";
 
-import { useState } from "react";
+export const dynamic = "force-dynamic";
 
-export default function AddToCartButton({ productId }) {
-  const [loading, setLoading] = useState(false);
-  const [msg, setMsg] = useState("");
+export default async function ProductDetails({ params }) {
+  const base = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+  const slug = String(params?.slug || "").toLowerCase();
 
-  const add = async () => {
-    setLoading(true);
-    setMsg("");
+  let product = null;
+  let error = "";
 
-    try {
-      const base = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+  try {
+    const res = await fetch(`${base}/api/products/${slug}`, {
+      cache: "no-store",
+    });
 
-      const res = await fetch(`${base}/api/cart/items`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include", // IMPORTANT: send cookies
-        body: JSON.stringify({ productId, qty: 1 }),
-      });
-
+    if (!res.ok) {
+      error = `Product not found (status ${res.status})`;
+    } else {
       const data = await res.json();
-
-      if (!res.ok) {
-        setMsg(data?.message || "Failed to add to cart");
-      } else {
-        setMsg("Added to cart ✅");
-      }
-    } catch (e) {
-      setMsg("Network error: cannot reach backend");
-    } finally {
-      setLoading(false);
+      product = data.product;
+      if (!product) error = "Product not found (empty response)";
     }
-  };
+  } catch {
+    error = `Network error: cannot reach API at ${base}`;
+  }
+
+  if (error) {
+    return (
+      <main style={{ padding: 24, fontFamily: "system-ui" }}>
+        <h1>Product not found</h1>
+        <p style={{ opacity: 0.8 }}>{error}</p>
+        <p style={{ opacity: 0.7 }}>Tried slug: {slug}</p>
+      </main>
+    );
+  }
 
   return (
-    <div>
-      <button onClick={add} disabled={loading} style={{ padding: "10px 14px" }}>
-        {loading ? "Adding..." : "Add to Cart"}
-      </button>
-      {msg ? <div style={{ marginTop: 10 }}>{msg}</div> : null}
-    </div>
+    <main style={{ padding: 24, fontFamily: "system-ui" }}>
+      <h1>{product.title}</h1>
+      <p style={{ opacity: 0.8 }}>{product.description || "No description"}</p>
+
+      <div style={{ marginTop: 12 }}>Price: ${product.priceUSD}</div>
+      <div>Stock: {product.stockQty}</div>
+      <div style={{ opacity: 0.7 }}>Slug: {product.slug}</div>
+
+      <div style={{ marginTop: 16 }}>
+        <AddToCartButton productId={product._id} />
+      </div>
+    </main>
   );
 }

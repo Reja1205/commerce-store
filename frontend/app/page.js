@@ -1,5 +1,7 @@
 import ProductsClient from "./components/ProductsClient";
 
+export const dynamic = "force-dynamic";
+
 export default async function Home() {
   const base = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 

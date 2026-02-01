@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 
 export default function CartPage() {
   return (
-    <Suspense fallback={<div>Loading Cart...</div>}>
+    <Suspense fallback={<div>Loading...</div>}>
       <SuccessParam>
         {(success) => <CartClient success={success} />}
       </SuccessParam>

@@ -1,5 +1,3 @@
-
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -46,7 +44,7 @@ export default function AdminEditProductPage() {
         setStockQty(String(p.stockQty ?? ""));
         setActive(Boolean(p.active));
       }
-    } catch (e) {
+    } catch {
       setMsg("Network error");
     } finally {
       setLoading(false);
@@ -55,7 +53,6 @@ export default function AdminEditProductPage() {
 
   useEffect(() => {
     load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   const save = async (e) => {
@@ -78,12 +75,9 @@ export default function AdminEditProductPage() {
       });
 
       const data = await res.json();
-      if (!res.ok) {
-        setMsg(data?.message || "Failed to save");
-      } else {
-        router.push("/admin/products");
-      }
-    } catch (e) {
+      if (!res.ok) setMsg(data?.message || "Failed to save");
+      else router.push("/admin/products");
+    } catch {
       setMsg("Network error");
     } finally {
       setSaving(false);
@@ -91,110 +85,44 @@ export default function AdminEditProductPage() {
   };
 
   const del = async () => {
-    const ok = confirm("Delete this product? This cannot be undone.");
-    if (!ok) return;
+    if (!confirm("Delete this product?")) return;
 
     setDeleting(true);
-    setMsg("");
-
     try {
-      const res = await fetch(`${base}/api/admin/products/${id}`, {
+      await fetch(`${base}/api/admin/products/${id}`, {
         method: "DELETE",
         credentials: "include",
       });
-
-      const data = await res.json();
-      if (!res.ok) {
-        setMsg(data?.message || "Failed to delete");
-      } else {
-        router.push("/admin/products");
-      }
-    } catch (e) {
-      setMsg("Network error");
+      router.push("/admin/products");
     } finally {
       setDeleting(false);
     }
   };
 
   return (
-    <main style={{ padding: 24, fontFamily: "system-ui", maxWidth: 520 }}>
+    <main style={{ padding: 24 }}>
       <Link href="/admin/products">← Back</Link>
+      <h1>Edit Product</h1>
 
-      <h1 style={{ marginTop: 12 }}>Edit Product</h1>
+      {loading && <p>Loading...</p>}
+      {msg && <p>{msg}</p>}
 
-      {loading ? <p>Loading...</p> : null}
-
-      {msg ? (
-        <div style={{ border: "1px solid #f99", padding: 10, borderRadius: 8 }}>
-          {msg}
-        </div>
-      ) : null}
-
-      {!loading ? (
-        <form onSubmit={save} style={{ display: "grid", gap: 10, marginTop: 12 }}>
-          <label>
-            Title
-            <input
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              style={{ width: "100%", padding: 10 }}
-            />
-          </label>
+      {!loading && (
+        <form onSubmit={save} style={{ display: "grid", gap: 10 }}>
+          <input value={title} onChange={(e) => setTitle(e.target.value)} />
+          <input value={slug} onChange={(e) => setSlug(e.target.value)} />
+          <input type="number" value={priceUSD} onChange={(e) => setPriceUSD(e.target.value)} />
+          <input type="number" value={stockQty} onChange={(e) => setStockQty(e.target.value)} />
 
           <label>
-            Slug
-            <input
-              value={slug}
-              onChange={(e) => setSlug(e.target.value)}
-              style={{ width: "100%", padding: 10 }}
-            />
-          </label>
-
-          <label>
-            Price (USD)
-            <input
-              type="number"
-              value={priceUSD}
-              onChange={(e) => setPriceUSD(e.target.value)}
-              style={{ width: "100%", padding: 10 }}
-            />
-          </label>
-
-          <label>
-            Stock Qty
-            <input
-              type="number"
-              value={stockQty}
-              onChange={(e) => setStockQty(e.target.value)}
-              style={{ width: "100%", padding: 10 }}
-            />
-          </label>
-
-          <label style={{ display: "flex", gap: 10, alignItems: "center" }}>
-            <input
-              type="checkbox"
-              checked={active}
-              onChange={(e) => setActive(e.target.checked)}
-            />
+            <input type="checkbox" checked={active} onChange={(e) => setActive(e.target.checked)} />
             Active
           </label>
 
-          <div style={{ display: "flex", gap: 10 }}>
-            <button disabled={saving} style={{ padding: "10px 14px" }}>
-              {saving ? "Saving..." : "Save"}
-            </button>
-
-            <button
-              type="button"
-              onClick={del}
-              disabled={deleting}
-              style={{ padding: "10px 14px" }}
-            >
-              {deleting ? "Deleting..." : "Delete"}
-            </button>
-          </div>
+          <button disabled={saving}>Save</button>
+          <button type="button" onClick={del} disabled={deleting}>Delete</button>
         </form>
-      ) : null}
+      )}
     </main>
   );
 }
