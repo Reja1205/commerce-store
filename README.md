@@ -26,3 +26,48 @@ Backend:
 - Admin Dashboard (if you have one)
 
 ## Project Structure
+ecommerce-store
+├── frontend # Next.js app
+└── backend # Express API
+
+
+## Environment Variables
+
+### Backend (.env)
+
+MONGODB_URI=your_mongodb_connection
+JWT_SECRET=your_secret
+PORT=4000
+
+### Frontend (.env.local)
+NEXT_PUBLIC_API_URL=https://your-backend-url.onrender.com
+
+## Run Locally
+
+### Backend
+cd backend
+npm install
+npm run dev
+
+### Frontend
+cd frontend
+npm install
+npm run dev
+
+## Deployment
+- Frontend deployed on Vercel
+- Backend deployed on Render
+- Database hosted on MongoDB Atlas
+
+
+## Deployment
+- Frontend deployed on Vercel
+- Backend deployed on Render
+- Database hosted on MongoDB Atlas
+
+## Author
+Your Name: Rejaur Rahman
+LinkedIn: https://linkedin.com/in/yourprofile
+
+
+
