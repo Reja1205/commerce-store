@@ -16,20 +16,38 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
-// CORS (frontend -> backend, cookies allowed)
+// -------- CORS CONFIG --------
+const allowedOrigins = [
+  "http://localhost:3000",      // local frontend
+  process.env.FRONTEND_URL      // vercel frontend
+].filter(Boolean);
+
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: (origin, callback) => {
+      // allow tools like Postman or server-to-server calls
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error(`CORS blocked: ${origin}`));
+    },
     credentials: true,
   })
 );
+// -------- END CORS --------
 
 // health check
 app.get("/health", (req, res) => {
   res.json({
     status: "OK",
     message: "Server is running",
-    db: mongoose.connection.readyState === 1 ? "connected" : "not_connected",
+    db:
+      mongoose.connection.readyState === 1
+        ? "connected"
+        : "not_connected",
   });
 });
 
