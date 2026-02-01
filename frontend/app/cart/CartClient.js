@@ -39,7 +39,9 @@ export default function CartClient() {
 
   useEffect(() => {
     const ok = searchParams.get("success");
-    if (ok === "1") setMsg("Checkout successful ✅ Your order has been placed.");
+    if (ok === "1") {
+      setMsg("Checkout successful ✅ Your order has been placed.");
+    }
     loadCart();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
