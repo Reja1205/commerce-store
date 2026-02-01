@@ -39,7 +39,7 @@ export default function CartClient() {
   };
 
   useEffect(() => {
-    // Check for success param using the Next.js hook instead of window.location
+    // Correct way to read search parameters in Next.js
     if (searchParams.get("success") === "1") {
       setMsg("Checkout successful ✅ Your order has been placed.");
     }
@@ -51,7 +51,6 @@ export default function CartClient() {
       setMsg("Qty must be 1 or more.");
       return;
     }
-
     setMsg("");
     try {
       const res = await fetch(`${base}/api/cart/items/${productId}`, {
@@ -60,7 +59,6 @@ export default function CartClient() {
         credentials: "include",
         body: JSON.stringify({ qty }),
       });
-
       const data = await res.json();
       if (!res.ok) setMsg(data?.message || "Failed to update quantity");
       else setCart(data.cart);
@@ -76,7 +74,6 @@ export default function CartClient() {
         method: "DELETE",
         credentials: "include",
       });
-
       const data = await res.json();
       if (!res.ok) setMsg(data?.message || "Failed to remove item");
       else setCart(data.cart);
@@ -88,13 +85,11 @@ export default function CartClient() {
   const checkout = async () => {
     setCheckingOut(true);
     setMsg("");
-
     try {
       const res = await fetch(`${base}/api/checkout`, {
         method: "POST",
         credentials: "include",
       });
-
       const data = await res.json();
       if (!res.ok) setMsg(data?.message || "Checkout failed");
       else router.push("/orders");
@@ -111,14 +106,12 @@ export default function CartClient() {
   return (
     <main style={{ padding: 24, fontFamily: "system-ui", maxWidth: 700 }}>
       <h1>Cart</h1>
-
       <div style={{ marginBottom: 12, display: "flex", gap: 12 }}>
         <Link href="/">← Continue shopping</Link>
         <Link href="/orders">My orders</Link>
       </div>
 
       {loading && <p>Loading...</p>}
-
       {msg && (
         <div style={{ marginTop: 12, border: "1px solid #ddd", padding: 10, borderRadius: 8 }}>
           {msg}
@@ -128,16 +121,7 @@ export default function CartClient() {
       {!loading && items.length === 0 && (
         <div style={{ marginTop: 16 }}>
           <p>Your cart is empty.</p>
-          <Link
-            href="/"
-            style={{
-              display: "inline-block",
-              marginTop: 10,
-              padding: "10px 12px",
-              border: "1px solid #ddd",
-              borderRadius: 8,
-            }}
-          >
+          <Link href="/" style={{ display: "inline-block", marginTop: 10, padding: "10px 12px", border: "1px solid #ddd", borderRadius: 8 }}>
             Browse products
           </Link>
         </div>
@@ -151,7 +135,6 @@ export default function CartClient() {
                 <div style={{ fontWeight: 700 }}>{i.titleSnapshot}</div>
                 <div style={{ opacity: 0.7 }}>Slug: {i.slugSnapshot}</div>
                 <div>Price: ${i.priceSnapshotUSD}</div>
-
                 <div style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 10 }}>
                   <label>Qty</label>
                   <input
@@ -161,22 +144,13 @@ export default function CartClient() {
                     onChange={(e) => updateQty(i.productId, Number(e.target.value))}
                     style={{ width: 80, padding: 8 }}
                   />
-                  <button onClick={() => removeItem(i.productId)} style={{ padding: "8px 10px" }}>
-                    Remove
-                  </button>
+                  <button onClick={() => removeItem(i.productId)} style={{ padding: "8px 10px" }}>Remove</button>
                 </div>
-
-                <div style={{ marginTop: 10, fontWeight: 600 }}>
-                  Line total: ${(i.priceSnapshotUSD * i.qty).toFixed(2)}
-                </div>
+                <div style={{ marginTop: 10, fontWeight: 600 }}>Line total: ${(i.priceSnapshotUSD * i.qty).toFixed(2)}</div>
               </li>
             ))}
           </ul>
-
-          <div style={{ marginTop: 16, fontSize: 18, fontWeight: 700 }}>
-            Items total: ${itemsTotal.toFixed(2)}
-          </div>
-
+          <div style={{ marginTop: 16, fontSize: 18, fontWeight: 700 }}>Items total: ${itemsTotal.toFixed(2)}</div>
           <div style={{ marginTop: 16 }}>
             <button onClick={checkout} disabled={checkingOut} style={{ padding: "10px 14px" }}>
               {checkingOut ? "Checking out..." : "Checkout (Mock Payment)"}

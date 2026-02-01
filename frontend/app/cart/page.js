@@ -1,5 +1,3 @@
-"use client";
-
 import { Suspense } from "react";
 import dynamic from "next/dynamic";
 
@@ -11,7 +9,8 @@ const CartClient = dynamic(() => import("./CartClient"), {
 
 export default function CartPage() {
   return (
-    <Suspense fallback={<p>Loading search parameters...</p>}>
+    // The Suspense boundary is required for useSearchParams() to work during build
+    <Suspense fallback={<p>Loading cart data...</p>}>
       <CartClient />
     </Suspense>
   );
