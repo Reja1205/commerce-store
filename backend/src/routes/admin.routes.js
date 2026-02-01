@@ -5,6 +5,7 @@ const { requireAuth } = require("../middlewares/auth.middleware");
 const { requireAdmin } = require("../middlewares/admin.middleware");
 
 const {
+  getProductByIdAdmin,
   createProduct,
   updateProduct,
   deleteProduct,
@@ -16,6 +17,7 @@ const {
 } = require("../controllers/adminOrder.controller");
 
 // Admin product management
+router.get("/products/:id", requireAuth, requireAdmin, getProductByIdAdmin);
 router.post("/products", requireAuth, requireAdmin, createProduct);
 router.patch("/products/:id", requireAuth, requireAdmin, updateProduct);
 router.delete("/products/:id", requireAuth, requireAdmin, deleteProduct);

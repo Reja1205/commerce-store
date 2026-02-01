@@ -1,4 +1,5 @@
 const Product = require("../models/Product");
+const slugify = require("../utils/slugify");
 
 /**
  * PUBLIC: List products
@@ -13,14 +14,15 @@ const listProducts = async (req, res) => {
     if (active === "false") filter.active = false;
 
     if (search) {
-      // simple search (title/slug)
       filter.$or = [
         { title: { $regex: search, $options: "i" } },
         { slug: { $regex: search, $options: "i" } },
       ];
     }
 
-    let query = Product.find(filter).select("title slug priceUSD stockQty active images createdAt");
+    let query = Product.find(filter).select(
+      "title slug priceUSD stockQty active images createdAt"
+    );
 
     if (sort === "newest") query = query.sort({ createdAt: -1 });
     if (sort === "price_asc") query = query.sort({ priceUSD: 1 });
@@ -51,23 +53,52 @@ const getProductBySlug = async (req, res) => {
 };
 
 /**
- * ADMIN: Create product
+ * ADMIN: Get product by id
+ * GET /api/admin/products/:id
+ */
+const getProductByIdAdmin = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const product = await Product.findById(id);
+    if (!product) return res.status(404).json({ message: "Product not found" });
+
+    return res.json({ product });
+  } catch (error) {
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
+/**
+ * ADMIN: Create product (slug auto-generated from title)
  * POST /api/admin/products
  */
 const createProduct = async (req, res) => {
   try {
-    const { title, slug, description, priceUSD, stockQty, active, images } = req.body;
+    const { title, description, priceUSD, stockQty, active, images } = req.body;
 
-    if (!title || !slug || priceUSD === undefined) {
-      return res.status(400).json({ message: "title, slug, priceUSD required" });
+    if (!title || priceUSD === undefined) {
+      return res.status(400).json({ message: "title and priceUSD required" });
     }
 
-    const existing = await Product.findOne({ slug: slug.toLowerCase() });
-    if (existing) return res.status(409).json({ message: "Slug already exists" });
+    const baseSlug = slugify(title);
+    if (!baseSlug) {
+      return res
+        .status(400)
+        .json({ message: "Invalid title (cannot create slug)" });
+    }
+
+    // Ensure unique slug: if exists, append -2, -3, ...
+    let uniqueSlug = baseSlug;
+    let counter = 2;
+    while (await Product.findOne({ slug: uniqueSlug })) {
+      uniqueSlug = `${baseSlug}-${counter}`;
+      counter += 1;
+    }
 
     const product = await Product.create({
       title,
-      slug: slug.toLowerCase(),
+      slug: uniqueSlug,
       description: description || "",
       priceUSD: Number(priceUSD),
       stockQty: stockQty === undefined ? 0 : Number(stockQty),
@@ -123,6 +154,7 @@ const deleteProduct = async (req, res) => {
 module.exports = {
   listProducts,
   getProductBySlug,
+  getProductByIdAdmin,
   createProduct,
   updateProduct,
   deleteProduct,
