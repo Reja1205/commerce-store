@@ -1,9 +1,9 @@
-export const dynamic = "force-dynamic";
-export const fetchCache = "force-no-store";
 "use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+
+export const dynamic = "force-dynamic";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -23,7 +23,7 @@ export default function LoginPage() {
       const res = await fetch(`${base}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include", // IMPORTANT: receive cookie
+        credentials: "include",
         body: JSON.stringify({ email, password }),
       });
 
@@ -35,7 +35,7 @@ export default function LoginPage() {
         setMsg("Logged in ✅");
         router.push("/");
       }
-    } catch (err) {
+    } catch {
       setMsg("Network error: cannot reach backend");
     } finally {
       setLoading(false);
