@@ -1,11 +1,13 @@
-export const dynamic = "force-dynamic";
 "use client";
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
+export const dynamic = "force-dynamic";
+
 export default function OrdersPage() {
   const base = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [msg, setMsg] = useState("");
@@ -13,19 +15,24 @@ export default function OrdersPage() {
   const load = async () => {
     setLoading(true);
     setMsg("");
+
     try {
       const res = await fetch(`${base}/api/orders`, {
         credentials: "include",
+        cache: "no-store",
       });
+
       const data = await res.json();
 
       if (!res.ok) {
         setMsg(data?.message || "Failed to load orders");
+        setOrders([]);
       } else {
         setOrders(data.orders || []);
       }
-    } catch (err) {
+    } catch {
       setMsg("Network error");
+      setOrders([]);
     } finally {
       setLoading(false);
     }
@@ -36,45 +43,25 @@ export default function OrdersPage() {
   }, []);
 
   return (
-    <main style={{ padding: 24, fontFamily: "system-ui", maxWidth: 900 }}>
+    <main style={{ padding: 24, fontFamily: "system-ui", maxWidth: 800 }}>
       <h1>My Orders</h1>
 
-      <div style={{ marginBottom: 12 }}>
-        <Link href="/">← Back to store</Link>
-      </div>
-
-      {loading && <p>Loading orders…</p>}
-
-      {msg && (
-        <div style={{ border: "1px solid #ddd", padding: 10 }}>
-          {msg}
-        </div>
-      )}
+      {loading && <p>Loading...</p>}
+      {msg && <p>{msg}</p>}
 
       {!loading && orders.length === 0 && !msg && (
-        <div>
-          <p>You don’t have any orders yet.</p>
-          <Link
-            href="/"
-            style={{ padding: "10px 12px", border: "1px solid #ddd" }}
-          >
-            Browse products
-          </Link>
-        </div>
+        <p>No orders yet.</p>
       )}
 
-      {!loading && orders.length > 0 && (
-        <ul style={{ listStyle: "none", padding: 0, display: "grid", gap: 12 }}>
-          {orders.map((o) => (
-            <li key={o._id} style={{ border: "1px solid #ddd", padding: 12 }}>
-              <div style={{ fontWeight: 700 }}>Order: {o._id}</div>
-              <div>Status: {o.status}</div>
-              <div>Total: ${o.grandTotalUSD}</div>
-              <Link href={`/orders/${o._id}`}>View details</Link>
-            </li>
-          ))}
-        </ul>
-      )}
+      <ul style={{ listStyle: "none", padding: 0, display: "grid", gap: 12 }}>
+        {orders.map((o) => (
+          <li key={o._id} style={{ border: "1px solid #ddd", padding: 12 }}>
+            <Link href={`/orders/${o._id}`}>
+              Order {o._id} – ${o.grandTotalUSD}
+            </Link>
+          </li>
+        ))}
+      </ul>
     </main>
   );
 }
