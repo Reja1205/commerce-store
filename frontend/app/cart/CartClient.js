@@ -2,11 +2,10 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export default function CartClient() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const base = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
   const [cart, setCart] = useState(null);
@@ -16,6 +15,7 @@ export default function CartClient() {
 
   const loadCart = async () => {
     setLoading(true);
+    setMsg("");
     try {
       const res = await fetch(`${base}/api/cart`, {
         credentials: "include",
@@ -38,8 +38,8 @@ export default function CartClient() {
   };
 
   useEffect(() => {
-    const ok = searchParams.get("success");
-    if (ok === "1") {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("success") === "1") {
       setMsg("Checkout successful ✅ Your order has been placed.");
     }
     loadCart();
@@ -106,10 +106,7 @@ export default function CartClient() {
   };
 
   const items = cart?.items || [];
-  const itemsTotal = items.reduce(
-    (sum, i) => sum + i.priceSnapshotUSD * i.qty,
-    0
-  );
+  const itemsTotal = items.reduce((sum, i) => sum + i.priceSnapshotUSD * i.qty, 0);
 
   return (
     <main style={{ padding: 24, fontFamily: "system-ui", maxWidth: 700 }}>
@@ -164,7 +161,6 @@ export default function CartClient() {
                     onChange={(e) => updateQty(i.productId, Number(e.target.value))}
                     style={{ width: 80, padding: 8 }}
                   />
-
                   <button onClick={() => removeItem(i.productId)} style={{ padding: "8px 10px" }}>
                     Remove
                   </button>

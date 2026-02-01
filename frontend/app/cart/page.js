@@ -1,7 +1,8 @@
 export const dynamic = "force-dynamic";
-export const revalidate = 0;
 
-import CartClient from "./CartClient";
+import dynamic from "next/dynamic";
+
+const CartClient = dynamic(() => import("./CartClient"), { ssr: false });
 
 export default function CartPage() {
   return <CartClient />;
