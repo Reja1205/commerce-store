@@ -1,16 +1,12 @@
 import { Suspense } from "react";
-import dynamic from "next/dynamic";
+import CartClient from "./CartClient";
 
-// Dynamically import the client component to ensure it only runs on the client
-const CartClient = dynamic(() => import("./CartClient"), { 
-  ssr: false,
-  loading: () => <p>Loading Cart...</p> 
-});
+// This tells Next.js to skip static generation for this page
+export const dynamic = "force-dynamic";
 
 export default function CartPage() {
   return (
-    // The Suspense boundary is required for useSearchParams() to work during build
-    <Suspense fallback={<p>Loading cart data...</p>}>
+    <Suspense fallback={<div>Loading Cart...</div>}>
       <CartClient />
     </Suspense>
   );
